@@ -1,0 +1,14 @@
+{
+  "name": "myapp",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "debug": "^4.1.1",
+    "log4js": "^4.5.1",
+    "grpc": "^1.22.2",
+    "@grpc/proto-loader": "^0.5.1",
+    "google-auth-library": "^5.2.0"
+  }
+}

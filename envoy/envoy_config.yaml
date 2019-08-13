@@ -1,0 +1,97 @@
+admin:
+  access_log_path: /dev/null
+  address:
+    socket_address:
+      address: 127.0.0.1
+      port_value: 9000
+
+node:
+  cluster: service_greeter
+  id: test-id
+
+static_resources:
+  listeners:
+  - name: listener_0
+    address:
+      socket_address: { address: 0.0.0.0, port_value: 18080 }
+    filter_chains:
+    - filters:
+      - name: envoy.http_connection_manager
+        config:
+          stat_prefix: ingress_http
+          codec_type: AUTO
+          route_config:
+            name: local_route
+            virtual_hosts:
+            - name: local_service
+              domains: ["*"]
+              routes:
+              - match:
+                  path: "/echo.EchoServer/SayHello"
+                route: { cluster: local_grpc_endpoint  }
+              - match:
+                  path: "/echo.EchoServer/SayHelloStream"
+                route: { cluster: local_grpc_endpoint  }                
+          http_filters:
+          - name: envoy.filters.http.jwt_authn
+            config:
+              providers:
+                google-jwt:
+                  issuer: https://accounts.google.com
+                  audiences:
+                  - https://foo.bar
+                  remote_jwks:
+                    http_uri:
+                      uri: https://www.googleapis.com/oauth2/v3/certs
+                      cluster: jwt.www.googleapis.com|443
+                  from_headers:
+                  - name: Authorization
+                    value_prefix: "Bearer "
+              rules:
+              - match:
+                  prefix: "/"
+                requires:
+                  provider_name: "google-jwt"          
+          - name: envoy.router
+            typed_config: {}
+      tls_context:
+        common_tls_context:
+          tls_certificates:
+            - certificate_chain:
+                filename: "../certs/server_crt.pem"
+              private_key:
+                filename: "../certs/server_key.pem"
+
+  clusters:
+  - name: local_grpc_endpoint
+    connect_timeout: 0.05s
+    type:  STATIC
+    http2_protocol_options: {}
+    lb_policy: ROUND_ROBIN
+    common_lb_config:
+      healthy_panic_threshold:
+        value: 50.0
+    hosts:
+    - socket_address:
+        address: 127.0.0.1
+        port_value: 8080
+
+  - name: local_admin
+    connect_timeout: 0.05s
+    type:  STATIC
+    lb_policy: ROUND_ROBIN
+    hosts:
+    - socket_address:
+        address: 127.0.0.1
+        port_value: 9000
+
+  - name: jwt.www.googleapis.com|443
+    type: LOGICAL_DNS
+    dns_lookup_family: V4_ONLY
+    connect_timeout: 2s
+    lb_policy: ROUND_ROBIN
+    hosts:
+    - socket_address:
+        address: www.googleapis.com
+        port_value: 443
+    tls_context: { sni: www.google.com }
