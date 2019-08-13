@@ -2,7 +2,7 @@
 
 
 This is a continuation of an article i wrote about [Authenticating using Google OpenID Connect Tokens](https://medium.com/google-cloud/authenticating-using-google-openid-connect-tokens-e7675051213b).  That article specifically focused on how to get ID Tokens using a combination of
-_google-auth-*_ libraries and directly acquiring the token and applyting them to [gRPC](https://grpc.io/) clients.  The specific advantage of using google auth libraries and Credentials they provide is the legwork of refreshing and applying them to grpc native receivers is a lot easier than manually fiddling with request interceptors.
+_google-auth-*_ libraries and directly acquiring the token and applying them to [gRPC](https://grpc.io/) clients.  The specific advantage of using google auth libraries and Credentials they provide is the legwork of refreshing and applying them to grpc native receivers is a lot easier than manually fiddling with request interceptors.
 
 ## gRPC Authentication
 
@@ -13,7 +13,7 @@ A bit of background..[gRPC Authentication](https://grpc.io/docs/guides/auth/) co
 
 For the token based authentication, an oauth2 `access_token` gets embedded inside a gRPC header itself similar to HTTP/Rest api calls.  You can see an example of how the HTTP2 frame carries the `Authorization: Bearer token` capability [here](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#example).
 
-Notice the Token based authentication emits an `access_token` intnded to get sent to a Google API or service...what we want to do in this article is to emit an `id_token` to a service _we_ run on somewhere we can host gRPC.  At the moment, that somewhere is really on a GCE or GKE if its limited to Google Cloud Services (Cloud Run, Cloud Functions, App Engine etc do NOT support inbound gRPC currently.).  For a primer on `access_token` vs `id_token`, review the article cited in the first paragraph.
+Notice the Token based authentication emits an `access_token` intended to get sent to a Google API or service...what we want to do in this article is to emit an `id_token` to a service _we_ run on somewhere we can host gRPC.  At the moment, that somewhere is really on a GCE or GKE if its limited to Google Cloud Services (Cloud Run, Cloud Functions, App Engine etc do NOT support inbound gRPC currently.).  For a primer on `access_token` vs `id_token`, review the article cited in the first paragraph.
 
 Anyway, we need an `id_token` for gRPC and while we can [Extending gRPC to support other authentication mechanisms](https://grpc.io/docs/guides/auth/)), there's an easier way to acquire and use an `id_token` within your clients.
 
@@ -35,16 +35,16 @@ So, whats contained here:
 Use `A` as a sample app that demonstrates gRPC app which also does automatic (re)validation of an authorization header.  If you are running your gRPC server behind an application that checks the request already (eg, istio), then there is no need to revaliate but thats subject to your paranoia.  Essentially that is:
 
 
-1. `Client`                       `-->`  `Server`
+1.  Client                         -->   Server
   
-    Any of [`go,python,java,node`] `-->`  [`go`]
+    Any of [`go,python,java,node`] -->  [`go`]
 
-2. `Client`                       `-->`   `Proxy`     `-->`   `Server`
+2.  Client                         -->  Proxy      -->   Server
   
-    Any of [`go,python,java,node`] `-->`   [`Envoy`]  `-->`   [`go`] 
+    Any of [`go,python,java,node`] -->  [`Envoy`]  -->   [`go`] 
 
 
-The client will first use google credentials to acquire an id_token and then embed that into the gRPC header.  THis step is done automatically for you by just specifying the credential type to use.  The samples demonstrate `ServiceAccountCredentials` but you are free to use any credntial type except user-based tokens (which cannot proivde id_tokens with named audiences).
+The client will first use google credentials to acquire an id_token and then embed that into the gRPC header.  THis step is done automatically for you by just specifying the credential type to use.  The samples demonstrate `ServiceAccountCredentials` but you are free to use any credential type except user-based tokens (which cannot proivde id_tokens with named audiences).
 
 The important aspects to note in each call is the client:  each language sample here shows how to get an `id_token` using google apis and then add it into the grpc transport.  For example, in golang:
 
@@ -92,7 +92,7 @@ now that you have the `rpcCreds`, embed that into the grpc channel credentials a
 	}
 ```
 
-For refernece, see: [https://godoc.org/google.golang.org/grpc#WithPerRPCCredentials](https://godoc.org/google.golang.org/grpc#WithPerRPCCredentials)
+For reference, see: [https://godoc.org/google.golang.org/grpc#WithPerRPCCredentials](https://godoc.org/google.golang.org/grpc#WithPerRPCCredentials)
 
 A couple of notes about the client bootstrapping credentials.  Not all `google-auth-*` libraries support out of the box id_tokens.  That work is in progress so the sample provided here for golang is experimental and sourced from *my* git repo (not google).  You are free to reuse that as necessary in the meantime.
 
@@ -208,7 +208,7 @@ To run, first startup the server in _insecure_ mode on port `:8080`
 
 - Server
 ```
-go run  src/grpc_server.go --grpcport :8080 --cert $CERTS/server_crt.pem --key $CERTS/server_key.pem --targetAudience https://foo.bar --usetls=false --validateToken=false
+go run  src/grpc_server.go --grpcport :8080 --cert $CERTS/server_crt.pem --key ../certs/server_key.pem --targetAudience https://foo.bar --usetls=false --validateToken=false
 ```
 
 Now run the envoy proxy which will listen on `:18080`
@@ -223,7 +223,7 @@ Now run the client to connect to the proxy
 - Client
 
 ```
-go run src/grpc_client.go --address localhost:18080 --usetls=true --cacert ../certs/CA_crt.pem --servername grpc.domain.com --audience  https://foo.bar --serviceAccount=/home/srashid/gcp_misc/certs/mineral-minutia-820-83b3ce7dcddb.json
+go run src/grpc_client.go --address localhost:18080 --usetls=true --cacert ../certs/CA_crt.pem --servername grpc.domain.com --audience  https://foo.bar --serviceAccount=/path/to/svc_account.json
 ```
 
 
