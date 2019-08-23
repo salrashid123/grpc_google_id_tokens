@@ -47,7 +47,7 @@ func authUnaryInterceptor(
 	if len(md["authorization"]) > 0 {
 		reqToken := md["authorization"][0]
 		splitToken := strings.Split(reqToken, "Bearer")
-		reqToken = splitToken[1]
+		reqToken = strings.TrimSpace(splitToken[1])
 		uid, err := verifyToken(ctx, reqToken, *targetAudience)
 		if err != nil {
 			return nil, grpc.Errorf(codes.Unauthenticated, "authentication required")
