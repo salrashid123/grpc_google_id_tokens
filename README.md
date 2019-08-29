@@ -23,16 +23,16 @@ The code samples provided here demonstrates how to get and use a Google OIDC tok
 
 So, whats contained here:
 
-- `A)`  gRPC Server in golang that can optionally revalidate any inbound `id_token`
+- **A)**  gRPC Server in golang that can optionally revalidate any inbound `id_token`
 
-- `B)`  grpc Clients in golang, java, python, nodejs that will acquire Google ID tokens using Google Auth libraries and use that token transparently in making unary calls to `A`
+- **B)**  grpc Clients in golang, java, python, nodejs that will acquire Google ID tokens using Google Auth libraries and use that token transparently in making unary calls to **A**
 
-- `C)`  `Dockerfile` for gRPC server in `A`
+- **C)**  `Dockerfile` for gRPC server in **A**
 
-- `D)`  [Envoy](https://www.envoyproxy.io/) configuration that will accept validate google-issued id_tokens embedded within gRPC requests.
+- **D)**  [Envoy](https://www.envoyproxy.io/) configuration that will accept validate google-issued id_tokens embedded within gRPC requests.
 
 
-Use `A` as a sample app that demonstrates gRPC app which also does automatic (re)validation of an authorization header.  If you are running your gRPC server behind an application that checks the request already (eg, istio), then there is no need to revaliate but thats subject to your paranoia.  Essentially that is:
+Use **A** as a sample app that demonstrates gRPC app which also does automatic (re)validation of an authorization header.  If you are running your gRPC server behind an application that checks the request already (eg, istio), then there is no need to revaliate but thats subject to your paranoia.  Essentially that is:
 
 
 1.  Client                         -->   Server
@@ -98,7 +98,7 @@ A couple of notes about the client bootstrapping credentials.  Not all `google-a
 
 
 * Python:  Supported as part of [google-auth-python](https://google-auth.readthedocs.io/en/latest/)
-* Java: Supported pending merge of[https://github.com/googleapis/google-auth-library-java/pull/303](https://github.com/googleapis/google-auth-library-java/pull/303).  At the moment, i've included the code snippets directly inline to the sample (see `java/src/main/ava/com/google/auth/oauth2/*`)
+* Java: Supported as part of [google-auth-library-java[(https://github.com/googleapis/google-auth-library-java).
 * Golang: Not supported.  I've provided sample imlementations for id_tokens and impersonation under [https://github.com/salrashid123/oauth2](https://github.com/salrashid123/oauth2)
 * NodeJS: Supported as part of [google-auth-nodejs](https://github.com/googleapis/google-auth-library-nodejs)
 
@@ -179,7 +179,7 @@ References:
 
 ### Java
 
-The java files provided in this repo **ALREADY** includes support for id_tokens as will be pull request [330](https://github.com/googleapis/google-auth-library-java/pull/303).  I'll remove the built in sources once that code is released into the auth library. NOTE, the api surface may change a bit till there (use the the library once its released; what i've got here isn't officially supported)
+The provided `src/main/java/com/test/TestApp.java` include a sample of using IDTokens
 
 to run, just execute `mvn clean install exec:java`
 
