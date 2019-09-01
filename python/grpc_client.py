@@ -10,9 +10,6 @@ from google.auth.transport import grpc as google_auth_transport_grpc
 from google.auth.transport import requests as google_auth_transport_requests
 from google.oauth2 import id_token, service_account
 
-#address = 'grpc-rx44ldyleq-uc.a.cloud-run-qual.sandbox.google.com:443'
-#target_audience = 'https://grpc-rx44ldyleq-uc.a.cloud-run-qual.sandbox.google.com'
-#server_sni_name = 'grpc-rx44ldyleq-uc.a.cloud-run-qual.sandbox.google.com'
 
 address = 'localhost:8080'
 target_audience = 'https://foo.bar'
