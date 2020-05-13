@@ -51,29 +51,14 @@ The important aspects to note in each call is the client:  each language sample 
 FIrst get an `id_token`
 
 ```golang
-import (
-    sal "github.com/salrashid123/oauth2/google"
-)
-//   ...
-//   ...
-
-	scopes := "https://www.googleapis.com/auth/userinfo.email"  // this doesn't really matter
-	data, err := ioutil.ReadFile(*serviceAccount)
+import "google.golang.org/api/idtoken"
+...
+...
+	idTokenSource, err := idtoken.NewTokenSource(ctx, targetAudience, idtoken.WithCredentialsFile(serviceAccount))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("unable to create TokenSource: %v", err)
 	}
-	creds, err := google.CredentialsFromJSON(ctx, data, scopes)
-	if err != nil {
-		log.Fatal(err)
-	}
-	idTokenSource, err := sal.IdTokenSource(
-		sal.IdTokenConfig{
-			Credentials: creds,
-			Audiences:   []string{*targetAudience},
-		},
-	)
-
-	rpcCreds, err := sal.NewIDTokenRPCCredential(ctx, idTokenSource)
+	tok, err := idTokenSource.Token()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,13 +68,15 @@ now that you have the `rpcCreds`, embed that into the grpc channel credentials a
 
 
 ```golang
-	ce := credentials.NewTLS(&tlsCfg)
+    ce := credentials.NewTLS(&tlsCfg)
 	conn, err = grpc.Dial(*address,
 		grpc.WithTransportCredentials(ce),
-		grpc.WithPerRPCCredentials(rpcCreds))
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
-	}
+		grpc.WithPerRPCCredentials(grpcTokenSource{
+			TokenSource: oauth.TokenSource{
+				idTokenSource,
+			},
+		}),
+	)
 ```
 
 For reference, see: [https://godoc.org/google.golang.org/grpc#WithPerRPCCredentials](https://godoc.org/google.golang.org/grpc#WithPerRPCCredentials)
@@ -103,58 +90,46 @@ A couple of notes about the client bootstrapping credentials.  Not all `google-a
 * NodeJS: Supported as part of [google-auth-nodejs](https://github.com/googleapis/google-auth-library-nodejs)
 
 
-## Implemenations
+## Implementations
 
 The samples below can be run with or without TLS though certain bindings will only allow credentials over TLS.   The snippets are stand alone and uses self-signed certificates with SNI bindings for serverName=`grpc.doman.com`.  Each of the language snippets shows how to specify a self-signed CA as well as how to specify the SNI header.
 
 
-First step is to download a [ServiceAccount JSON](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) file from any google cloud project.  Once you have that, run the gRPC server and any client you want
+First step is to download a [ServiceAccount JSON](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) file from any google cloud project.  Once you have that, run the gRPC server and any client you want.
 
 
 If you want to modify the proto, install `protoc` and the plugins for the languages you're interested in.  You can inspect the steps detailed in `golang/Dockerfile` for the setp steps for `protoc`.
 
 ### Golang
 
-You can runt he go sample here in two modes: secure and insecure.  If you want to transmit the `Authorization` Header, its encouraged to run the secure mode.
+You can run he go sample here in two modes: secure and insecure.  If you want to transmit the `Authorization` Header, its encouraged to run the secure mode.
 
 
 ```
 cd golang
-export GOPATH=`pwd`:$GOPATH
-go get github.com/golang/protobuf/proto \
-           github.com/golang/protobuf/protoc-gen-go \
-           golang.org/x/net/context \
-           google.golang.org/grpc \
-           google.golang.org/grpc/credentials \
-           golang.org/x/oauth2 \
-           cloud.google.com/go/compute/metadata \
-           github.com/salrashid123/oauth2/google \
-           golang.org/x/net/http2
+docker build -t client -f Dockerfile.client .
+docker build -t server -f Dockerfile.server .
 ```
 
 #### Secure
 
 - Server
 ```
-$ go run  src/grpc_server.go --grpcport :8080 --cert ../certs/server_crt.pem --key ../certs/server_key.pem --targetAudience https://foo.bar --usetls=true --validateToken=true
+docker run -p 8080:8080 server /grpc_server \
+  --grpcport=:8080 --targetAudience=https://foo.bar \
+  --usetls=false --validateToken=true
 ```
 
 - Client
 ```
-$ go run src/grpc_client.go --address localhost:8080 --usetls=true --cacert ..//CA_crt.pem --servername grpc.domain.com --audience  https://foo.bar --serviceAccount=/path/to/yoru/svc_accunt.json
+docker run --net=host \
+  -v `pwd`/certs:/certs -t client /grpc_client \
+  --address localhost:8080  --usetls=true  \
+  --servername grpc.domain.com --audience https://foo.bar \
+  --cacert CA_crt.pem --serviceAccount /certs/grpc_client.json
 ```
+Remember to place the service account JSOn file under the local `certs/` folder (for example for go `grpc_google_id_tokens/golang/certs/grpc_client.json` or wherever you mount the volume)
 
-#### Insecure
-
-- Server
-```
-$ go run src/grpc_server.go --grpcport :8080  --usetls=false
-```
-
-- Client
-```
-$ go run src/grpc_client.go --address localhost:8080 --usetls=false
-```
 
 ### Python
 
@@ -187,7 +162,7 @@ to run, just execute `mvn clean install exec:java`
 If you want to regenerate the proto, [download the plugin](https://github.com/grpc/grpc-java/tree/master/compiler), then execute the compiler
 ```
  protoc --plugin=protoc-gen-grpc-java=/path/to/protoc-gen-grpc-java --java_out=src/main/java   --grpc-java_out=lite:src/main/java/ --proto_path=echo/ echo/echo.proto
- ```
+```
 
 
 ### Nodejs

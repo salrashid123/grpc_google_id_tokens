@@ -10,15 +10,23 @@ import (
 	"log"
 	"time"
 
-	sal "github.com/salrashid123/oauth2/google"
+	//sal "github.com/salrashid123/oauth2/google"
 	"golang.org/x/net/context"
-	"golang.org/x/oauth2/google"
+	"google.golang.org/api/idtoken"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/oauth"
 	"google.golang.org/grpc/metadata"
 )
 
 const ()
+
+type grpcTokenSource struct {
+	oauth.TokenSource
+	// Additional metadata attached as headers.
+	quotaProject  string
+	requestReason string
+}
 
 var (
 	address        = flag.String("address", "localhost:8080", "host:port of gRPC server")
@@ -35,26 +43,15 @@ func main() {
 
 	ctx := context.Background()
 
-	scopes := "https://www.googleapis.com/auth/userinfo.email"
-	data, err := ioutil.ReadFile(*serviceAccount)
+	idTokenSource, err := idtoken.NewTokenSource(ctx, *targetAudience, idtoken.WithCredentialsFile(*serviceAccount))
+	if err != nil {
+		log.Fatalf("unable to create TokenSource: %v", err)
+	}
+	tok, err := idTokenSource.Token()
 	if err != nil {
 		log.Fatal(err)
 	}
-	creds, err := google.CredentialsFromJSON(ctx, data, scopes)
-	if err != nil {
-		log.Fatal(err)
-	}
-	idTokenSource, err := sal.IdTokenSource(
-		sal.IdTokenConfig{
-			Credentials: creds,
-			Audiences:   []string{*targetAudience},
-		},
-	)
-
-	rpcCreds, err := sal.NewIDTokenRPCCredential(ctx, idTokenSource)
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Printf("IdToken %s", tok)
 
 	var conn *grpc.ClientConn
 	if !*usetls {
@@ -80,7 +77,12 @@ func main() {
 		ce := credentials.NewTLS(&tlsCfg)
 		conn, err = grpc.Dial(*address,
 			grpc.WithTransportCredentials(ce),
-			grpc.WithPerRPCCredentials(rpcCreds))
+			grpc.WithPerRPCCredentials(grpcTokenSource{
+				TokenSource: oauth.TokenSource{
+					idTokenSource,
+				},
+			}),
+		)
 		if err != nil {
 			log.Fatalf("did not connect: %v", err)
 		}
@@ -98,7 +100,7 @@ func main() {
 
 	var header, trailer metadata.MD
 
-	for i := 0; i < 3; i++ {
+	for i := 0; i < 5; i++ {
 		r, err := c.SayHello(ctx, &pb.EchoRequest{Name: "unary RPC msg "}, grpc.Header(&header), grpc.Trailer(&trailer))
 		if err != nil {
 			log.Fatalf("could not greet: %v", err)
