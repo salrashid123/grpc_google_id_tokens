@@ -13,7 +13,11 @@ A bit of background..[gRPC Authentication](https://grpc.io/docs/guides/auth/) co
 
 For the token based authentication, an oauth2 `access_token` gets embedded inside a gRPC header itself similar to HTTP/Rest api calls.  You can see an example of how the HTTP2 frame carries the `Authorization: Bearer token` capability [here](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-HTTP2.md#example).
 
-Notice the Token based authentication emits an `access_token` intended to get sent to a Google API or service...what we want to do in this article is to emit an `id_token` to a service _we_ run on somewhere we can host gRPC.  At the moment, that somewhere is really on a GCE or GKE if its limited to Google Cloud Services (Cloud Run, Cloud Functions, App Engine etc do NOT support inbound gRPC currently.).  For a primer on `access_token` vs `id_token`, review the article cited in the first paragraph.
+Notice the Token based authentication emits an `access_token` intended to get sent to a Google API or service...what we want to do in this article is to emit an `id_token` to a service _we_ run on somewhere we can host gRPC.  At the moment, that somewhere is really on a GCE, GKE and Cloud Run or an arbitrary service that you run somewhere that happens to process google `id_token`.  For a primer on `access_token` vs `id_token`, review the article cited in the first paragraph.
+
+The following is a specific end-to-end example for Cloud Run
+
+- [gRPC Authentication with Cloud Run](https://github.com/salrashid123/cloud_run_grpc_auth)
 
 Anyway, we need an `id_token` for gRPC and while we can [Extending gRPC to support other authentication mechanisms](https://grpc.io/docs/guides/auth/)), there's an easier way to acquire and use an `id_token` within your clients.
 
