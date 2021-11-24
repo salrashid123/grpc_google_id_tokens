@@ -16,10 +16,12 @@ static_resources:
       socket_address: { address: 0.0.0.0, port_value: 18080 }
     filter_chains:
     - filters:
-      - name: envoy.http_connection_manager
-        config:
+      - name: envoy.filters.network.http_connection_manager
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
           stat_prefix: ingress_http
           codec_type: AUTO
+          http2_protocol_options: {}
           route_config:
             name: local_route
             virtual_hosts:
@@ -27,23 +29,28 @@ static_resources:
               domains: ["*"]
               routes:
               - match:
-                  path: "/echo.EchoServer/SayHello"
-                route: { cluster: local_grpc_endpoint  }
+                  prefix: "/echo.EchoServer/SayHello"
+                route: 
+                  cluster: local_grpc_endpoint
               - match:
-                  path: "/echo.EchoServer/SayHelloStream"
-                route: { cluster: local_grpc_endpoint  }                
+                  prefix: "/echo.EchoServer/SayHelloStream"
+                route: 
+                  cluster: local_grpc_endpoint           
           http_filters:
           - name: envoy.filters.http.jwt_authn
-            config:
-              providers:
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+              providers:          
                 google-jwt:
                   issuer: https://accounts.google.com
                   audiences:
-                  - https://foo.bar
+                  - http://foo.bar
                   remote_jwks:
                     http_uri:
                       uri: https://www.googleapis.com/oauth2/v3/certs
                       cluster: jwt.www.googleapis.com|443
+                      timeout:
+                        seconds: 5                      
                   from_headers:
                   - name: Authorization
                     value_prefix: "Bearer "
@@ -51,17 +58,19 @@ static_resources:
               - match:
                   prefix: "/"
                 requires:
-                  provider_name: "google-jwt"          
-          - name: envoy.router
-            typed_config: {}
-      tls_context:
-        common_tls_context:
-          tls_certificates:
+                  provider_name: "google-jwt"
+          - name: envoy.filters.http.router
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+          require_client_certificate: true          
+          common_tls_context:
+            tls_certificates:
             - certificate_chain:
                 filename: "../certs/server_crt.pem"
               private_key:
                 filename: "../certs/server_key.pem"
-
   clusters:
   - name: local_grpc_endpoint
     connect_timeout: 0.05s
@@ -71,27 +80,52 @@ static_resources:
     common_lb_config:
       healthy_panic_threshold:
         value: 50.0
-    hosts:
-    - socket_address:
-        address: 127.0.0.1
-        port_value: 8080
+    load_assignment:
+      cluster_name: local_grpc_endpoint
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 8080  
+
 
   - name: local_admin
     connect_timeout: 0.05s
     type:  STATIC
     lb_policy: ROUND_ROBIN
-    hosts:
-    - socket_address:
-        address: 127.0.0.1
-        port_value: 9000
+    load_assignment:
+      cluster_name: local_admin
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 127.0.0.1
+                port_value: 9000  
+
 
   - name: jwt.www.googleapis.com|443
-    type: LOGICAL_DNS
+    type: STRICT_DNS
+    connect_timeout: 5s
     dns_lookup_family: V4_ONLY
-    connect_timeout: 2s
-    lb_policy: ROUND_ROBIN
-    hosts:
-    - socket_address:
-        address: www.googleapis.com
-        port_value: 443
-    tls_context: { sni: www.google.com }
+    http2_protocol_options: {}
+    load_assignment:
+      cluster_name: service_grpc
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: www.googleapis.com
+                port_value: 443  
+    transport_socket:
+      name: envoy.transport_sockets.tls
+      typed_config:
+        "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+        common_tls_context:    
+          validation_context:
+            trusted_ca:
+              filename: "../certs/gcp_roots.pem"  
+              # wget -O gcp_roots.pem https://pki.google.com/roots.pem
