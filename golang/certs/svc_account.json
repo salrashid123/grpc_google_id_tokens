@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "mineral-minutia-820",
+  "private_key_id": "e9a7c8665867e6d02d7133abf355b7ced5397e85",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCgMdkCJOLtu56f\n+PxJia7zTH2O4wkPvHIPZCAyeDJIW8dRIjgmVv6lOM7iiOGT2MGtBwygPeNTGRkb\nqeYeFmfo/t40ZJstfzrBuoiCUSLrFjIlP8YT/7z1NMMIonMworRgRCR4sODFXM+P\nt37qYArXXar9Ox8OYDZCVyEjuqi9Smo7ltuLo0uijTd9bErZ2+1ybEmI4thit7W3\n7ikPqOThtmfiRnYbJotp4TXGqtrz293fC51LwDmwCUdlk2BggVPpmKywbLs6ev3W\nW+G//RZkdJA20stRlfNge91uJQ8JXHJmXH3t1vYFTZNKyj9NsDgeXO/Vi212J/5I\nJCZdtuArAgMBAAECggEARitvlivYJzBu3D3xLLkdpD8WJJe4aWcvQySlodXamK1z\nEkv98nVa176ZiMtSnDNvKr6SvkI9qDGvONnkDbvcykeRx7tl6bj4YNG3Z/XoaLdx\nQbW8qxfziikRYV/fOyeaASz4GNHJs0njNV24PyvQs+O4uXHDOcXVHpwRzRe/QCJ9\nV+3WFhk9iG12BojqThOiWaIsBHjzm74MDPb/Kvb3dNlvCXFSpjDkrJUCygeyhPXy\nHITTzr86/VJbGBFttLOhUWKIG4zicoWX+5crk0BD2OOy2IaHq4AFDHnw55lAhaiA\noB6WH+cSfpc0q8dvifso5VdZ5mT51dbBSQ/UX7DqIQKBgQDeJ4GDQB4Po5J9FNWG\nyxKeN9MH86u7yRbGj3raV4TY9DXMmcW86rhP+UcwKhoH0LiqYhD8C+BSqzs5jTEx\nkehvlandMmDRacNDIQku9D+DCUHpt9uZSovDrXrafVqI68Br+4JYDOGF52qiWRjL\nKYsam6HPSXlac83gavzeSOe8cQKBgQC4mcjd36PqG5044ROI3LtgUlwQ7l/kPjm2\nvp+y1F989gdWAwEMTmzDEI+clm9XxeYh1gE8J0wRP302KIfxPPfrKJ75mdfQ9UVb\nAs60zrhwKmnKcO9K6FbGgr3UxyBUKyMriUJycQ7Qa/2BMBSSJ4cIVeraOXwqeSg2\nUVvY8cckWwKBgQCr8R/ImkOqDww+S3XI0jwiwUpQiUSOH2HFZR/NBpgH41wQc6Qc\nR/9HxsRWfv+OtPl4xlYm/notAeLg9Gry1t90Hf5O+cL90kITHuqgsOLHZM7jOi55\nQr1SQl8n5IXCG9XevddwluemYCqkZRlPhWPowDRI37FRVPgvjh8RXJQfwQKBgGCy\n3g+riNenY3JaJLt6tQS939BWrhCHr//UVx98NBDnZ+xcYn4pzrtXv4LNIsIdvnFX\nAwqZozUdxt9J1/w8bbnXa39gYTbqZExKajE4YFERRp1vD0pz7pDKB9qf/IVam2/A\n1PfR1WrERuUXZI8y+X8aUo3BsxMkqDXb5Hr+G80lAoGAQg6ILde6kXCE0mbtho7e\n9qA6A73PodUKVd3HRx9n2+0AnahsNo5m6IeHfAyeWQXykw+rUt9D430Q7tQMWZuB\nouCg0al3bbCgh+eHHMC3nCR6IDL7qkMZ+VOXuCSoPylYuE+lajLs+xnZ3YgE/id7\nPPDZTzrgOeoMQ1jG4ExcuGw=\n-----END PRIVATE KEY-----\n",
+  "client_email": "svcaccount1@mineral-minutia-820.iam.gserviceaccount.com",
+  "client_id": "107846671635241723821",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/svcaccount1%40mineral-minutia-820.iam.gserviceaccount.com"
+}

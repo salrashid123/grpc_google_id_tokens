@@ -3,12 +3,13 @@ package main
 import (
 	"crypto/tls"
 	"crypto/x509"
-	pb "echo"
 	"flag"
 	"io"
 	"io/ioutil"
 	"log"
 	"time"
+
+	pb "github.com/salrashid123/grpc_google_id_tokens/echo"
 
 	//sal "github.com/salrashid123/oauth2/google"
 	"golang.org/x/net/context"

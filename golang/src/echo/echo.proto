@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 package echo;
+option go_package = "github.com/salrashid123/grpc_google_id_tokens/echo";
+
 
 service EchoServer {
   rpc SayHello (EchoRequest) returns (EchoReply) {}

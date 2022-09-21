@@ -1,25 +1,13 @@
 package echo;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
-import static io.grpc.stub.ClientCalls.asyncBidiStreamingCall;
-import static io.grpc.stub.ClientCalls.asyncClientStreamingCall;
-import static io.grpc.stub.ClientCalls.asyncServerStreamingCall;
-import static io.grpc.stub.ClientCalls.asyncUnaryCall;
-import static io.grpc.stub.ClientCalls.blockingServerStreamingCall;
-import static io.grpc.stub.ClientCalls.blockingUnaryCall;
-import static io.grpc.stub.ClientCalls.futureUnaryCall;
-import static io.grpc.stub.ServerCalls.asyncBidiStreamingCall;
-import static io.grpc.stub.ServerCalls.asyncClientStreamingCall;
-import static io.grpc.stub.ServerCalls.asyncServerStreamingCall;
-import static io.grpc.stub.ServerCalls.asyncUnaryCall;
-import static io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall;
-import static io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall;
 
 /**
  */
 @javax.annotation.Generated(
-    value = "by gRPC proto compiler (version 1.22.1)",
+    value = "by gRPC proto compiler (version 1.49.1)",
     comments = "Source: echo.proto")
+@io.grpc.stub.annotations.GrpcGenerated
 public final class EchoServerGrpc {
 
   private EchoServerGrpc() {}
@@ -41,21 +29,20 @@ public final class EchoServerGrpc {
     if ((getSayHelloMethod = EchoServerGrpc.getSayHelloMethod) == null) {
       synchronized (EchoServerGrpc.class) {
         if ((getSayHelloMethod = EchoServerGrpc.getSayHelloMethod) == null) {
-          EchoServerGrpc.getSayHelloMethod = getSayHelloMethod = 
+          EchoServerGrpc.getSayHelloMethod = getSayHelloMethod =
               io.grpc.MethodDescriptor.<echo.Echo.EchoRequest, echo.Echo.EchoReply>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
-              .setFullMethodName(generateFullMethodName(
-                  "echo.EchoServer", "SayHello"))
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "SayHello"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.lite.ProtoLiteUtils.marshaller(
                   echo.Echo.EchoRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.lite.ProtoLiteUtils.marshaller(
                   echo.Echo.EchoReply.getDefaultInstance()))
-                  .build();
-          }
+              .build();
         }
-     }
-     return getSayHelloMethod;
+      }
+    }
+    return getSayHelloMethod;
   }
 
   private static volatile io.grpc.MethodDescriptor<echo.Echo.EchoRequest,
@@ -72,28 +59,34 @@ public final class EchoServerGrpc {
     if ((getSayHelloStreamMethod = EchoServerGrpc.getSayHelloStreamMethod) == null) {
       synchronized (EchoServerGrpc.class) {
         if ((getSayHelloStreamMethod = EchoServerGrpc.getSayHelloStreamMethod) == null) {
-          EchoServerGrpc.getSayHelloStreamMethod = getSayHelloStreamMethod = 
+          EchoServerGrpc.getSayHelloStreamMethod = getSayHelloStreamMethod =
               io.grpc.MethodDescriptor.<echo.Echo.EchoRequest, echo.Echo.EchoReply>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.SERVER_STREAMING)
-              .setFullMethodName(generateFullMethodName(
-                  "echo.EchoServer", "SayHelloStream"))
+              .setFullMethodName(generateFullMethodName(SERVICE_NAME, "SayHelloStream"))
               .setSampledToLocalTracing(true)
               .setRequestMarshaller(io.grpc.protobuf.lite.ProtoLiteUtils.marshaller(
                   echo.Echo.EchoRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.lite.ProtoLiteUtils.marshaller(
                   echo.Echo.EchoReply.getDefaultInstance()))
-                  .build();
-          }
+              .build();
         }
-     }
-     return getSayHelloStreamMethod;
+      }
+    }
+    return getSayHelloStreamMethod;
   }
 
   /**
    * Creates a new async stub that supports all call types for the service
    */
   public static EchoServerStub newStub(io.grpc.Channel channel) {
-    return new EchoServerStub(channel);
+    io.grpc.stub.AbstractStub.StubFactory<EchoServerStub> factory =
+      new io.grpc.stub.AbstractStub.StubFactory<EchoServerStub>() {
+        @java.lang.Override
+        public EchoServerStub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+          return new EchoServerStub(channel, callOptions);
+        }
+      };
+    return EchoServerStub.newStub(factory, channel);
   }
 
   /**
@@ -101,7 +94,14 @@ public final class EchoServerGrpc {
    */
   public static EchoServerBlockingStub newBlockingStub(
       io.grpc.Channel channel) {
-    return new EchoServerBlockingStub(channel);
+    io.grpc.stub.AbstractStub.StubFactory<EchoServerBlockingStub> factory =
+      new io.grpc.stub.AbstractStub.StubFactory<EchoServerBlockingStub>() {
+        @java.lang.Override
+        public EchoServerBlockingStub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+          return new EchoServerBlockingStub(channel, callOptions);
+        }
+      };
+    return EchoServerBlockingStub.newStub(factory, channel);
   }
 
   /**
@@ -109,7 +109,14 @@ public final class EchoServerGrpc {
    */
   public static EchoServerFutureStub newFutureStub(
       io.grpc.Channel channel) {
-    return new EchoServerFutureStub(channel);
+    io.grpc.stub.AbstractStub.StubFactory<EchoServerFutureStub> factory =
+      new io.grpc.stub.AbstractStub.StubFactory<EchoServerFutureStub>() {
+        @java.lang.Override
+        public EchoServerFutureStub newStub(io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
+          return new EchoServerFutureStub(channel, callOptions);
+        }
+      };
+    return EchoServerFutureStub.newStub(factory, channel);
   }
 
   /**
@@ -120,28 +127,28 @@ public final class EchoServerGrpc {
      */
     public void sayHello(echo.Echo.EchoRequest request,
         io.grpc.stub.StreamObserver<echo.Echo.EchoReply> responseObserver) {
-      asyncUnimplementedUnaryCall(getSayHelloMethod(), responseObserver);
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getSayHelloMethod(), responseObserver);
     }
 
     /**
      */
     public void sayHelloStream(echo.Echo.EchoRequest request,
         io.grpc.stub.StreamObserver<echo.Echo.EchoReply> responseObserver) {
-      asyncUnimplementedUnaryCall(getSayHelloStreamMethod(), responseObserver);
+      io.grpc.stub.ServerCalls.asyncUnimplementedUnaryCall(getSayHelloStreamMethod(), responseObserver);
     }
 
     @java.lang.Override public final io.grpc.ServerServiceDefinition bindService() {
       return io.grpc.ServerServiceDefinition.builder(getServiceDescriptor())
           .addMethod(
             getSayHelloMethod(),
-            asyncUnaryCall(
+            io.grpc.stub.ServerCalls.asyncUnaryCall(
               new MethodHandlers<
                 echo.Echo.EchoRequest,
                 echo.Echo.EchoReply>(
                   this, METHODID_SAY_HELLO)))
           .addMethod(
             getSayHelloStreamMethod(),
-            asyncServerStreamingCall(
+            io.grpc.stub.ServerCalls.asyncServerStreamingCall(
               new MethodHandlers<
                 echo.Echo.EchoRequest,
                 echo.Echo.EchoReply>(
@@ -152,19 +159,15 @@ public final class EchoServerGrpc {
 
   /**
    */
-  public static final class EchoServerStub extends io.grpc.stub.AbstractStub<EchoServerStub> {
-    private EchoServerStub(io.grpc.Channel channel) {
-      super(channel);
-    }
-
-    private EchoServerStub(io.grpc.Channel channel,
-        io.grpc.CallOptions callOptions) {
+  public static final class EchoServerStub extends io.grpc.stub.AbstractAsyncStub<EchoServerStub> {
+    private EchoServerStub(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
     }
 
     @java.lang.Override
-    protected EchoServerStub build(io.grpc.Channel channel,
-        io.grpc.CallOptions callOptions) {
+    protected EchoServerStub build(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       return new EchoServerStub(channel, callOptions);
     }
 
@@ -172,7 +175,7 @@ public final class EchoServerGrpc {
      */
     public void sayHello(echo.Echo.EchoRequest request,
         io.grpc.stub.StreamObserver<echo.Echo.EchoReply> responseObserver) {
-      asyncUnaryCall(
+      io.grpc.stub.ClientCalls.asyncUnaryCall(
           getChannel().newCall(getSayHelloMethod(), getCallOptions()), request, responseObserver);
     }
 
@@ -180,33 +183,29 @@ public final class EchoServerGrpc {
      */
     public void sayHelloStream(echo.Echo.EchoRequest request,
         io.grpc.stub.StreamObserver<echo.Echo.EchoReply> responseObserver) {
-      asyncServerStreamingCall(
+      io.grpc.stub.ClientCalls.asyncServerStreamingCall(
           getChannel().newCall(getSayHelloStreamMethod(), getCallOptions()), request, responseObserver);
     }
   }
 
   /**
    */
-  public static final class EchoServerBlockingStub extends io.grpc.stub.AbstractStub<EchoServerBlockingStub> {
-    private EchoServerBlockingStub(io.grpc.Channel channel) {
-      super(channel);
-    }
-
-    private EchoServerBlockingStub(io.grpc.Channel channel,
-        io.grpc.CallOptions callOptions) {
+  public static final class EchoServerBlockingStub extends io.grpc.stub.AbstractBlockingStub<EchoServerBlockingStub> {
+    private EchoServerBlockingStub(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
     }
 
     @java.lang.Override
-    protected EchoServerBlockingStub build(io.grpc.Channel channel,
-        io.grpc.CallOptions callOptions) {
+    protected EchoServerBlockingStub build(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       return new EchoServerBlockingStub(channel, callOptions);
     }
 
     /**
      */
     public echo.Echo.EchoReply sayHello(echo.Echo.EchoRequest request) {
-      return blockingUnaryCall(
+      return io.grpc.stub.ClientCalls.blockingUnaryCall(
           getChannel(), getSayHelloMethod(), getCallOptions(), request);
     }
 
@@ -214,26 +213,22 @@ public final class EchoServerGrpc {
      */
     public java.util.Iterator<echo.Echo.EchoReply> sayHelloStream(
         echo.Echo.EchoRequest request) {
-      return blockingServerStreamingCall(
+      return io.grpc.stub.ClientCalls.blockingServerStreamingCall(
           getChannel(), getSayHelloStreamMethod(), getCallOptions(), request);
     }
   }
 
   /**
    */
-  public static final class EchoServerFutureStub extends io.grpc.stub.AbstractStub<EchoServerFutureStub> {
-    private EchoServerFutureStub(io.grpc.Channel channel) {
-      super(channel);
-    }
-
-    private EchoServerFutureStub(io.grpc.Channel channel,
-        io.grpc.CallOptions callOptions) {
+  public static final class EchoServerFutureStub extends io.grpc.stub.AbstractFutureStub<EchoServerFutureStub> {
+    private EchoServerFutureStub(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       super(channel, callOptions);
     }
 
     @java.lang.Override
-    protected EchoServerFutureStub build(io.grpc.Channel channel,
-        io.grpc.CallOptions callOptions) {
+    protected EchoServerFutureStub build(
+        io.grpc.Channel channel, io.grpc.CallOptions callOptions) {
       return new EchoServerFutureStub(channel, callOptions);
     }
 
@@ -241,7 +236,7 @@ public final class EchoServerGrpc {
      */
     public com.google.common.util.concurrent.ListenableFuture<echo.Echo.EchoReply> sayHello(
         echo.Echo.EchoRequest request) {
-      return futureUnaryCall(
+      return io.grpc.stub.ClientCalls.futureUnaryCall(
           getChannel().newCall(getSayHelloMethod(), getCallOptions()), request);
     }
   }

@@ -13,12 +13,12 @@ from google.oauth2 import id_token, service_account
 
 address = 'localhost:8080'
 target_audience = 'https://foo.bar'
-server_sni_name = 'server.domain.com'
+server_sni_name = 'grpc.domain.com'
 
 usetls = True
-ca_certificate = '../certs/CA_crt.pem'
+ca_certificate = '../certs/tls-ca.crt'
 
-svcAccountFile =  '/path/to/svc_account.json'
+svcAccountFile =  '../certs/grpc_client.json'
 
 channel = None
 if usetls:
@@ -39,4 +39,4 @@ else:
 
 stub = echo_pb2_grpc.EchoServerStub(channel)
 response = stub.SayHello(EchoRequest(name='you'))
-print "Echo client received: " + response.message
+print("Echo client received: " + response.message)

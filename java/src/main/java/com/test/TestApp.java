@@ -29,12 +29,12 @@ public class TestApp {
 
                String address = "localhost";
                String targetAudience = "https://foo.bar";
-               String certificateFile = "../certs/CA_crt.pem";
+               String certificateFile = "../certs/tls-ca.crt";
 
                int port = 8080;
-               String sniServerName = "server.domain.com";
+               String sniServerName = "grpc.domain.com";
                
-               String svcAccountFile = "/path/to/svc_account.json";
+               String svcAccountFile = "../certs/grpc_client.json";
 
                // ServiceAccountCredentials
                ServiceAccountCredentials saCreds = ServiceAccountCredentials

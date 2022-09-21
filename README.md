@@ -104,13 +104,28 @@ First step is to download a [ServiceAccount JSON](https://cloud.google.com/iam/d
 
 If you want to modify the proto, install `protoc` and the plugins for the languages you're interested in.  You can inspect the steps detailed in `golang/Dockerfile` for the setp steps for `protoc`.
 
+### Setup - create ServiceAccount
+
+First create a service account key
+
+```bash
+cd certs/
+export PROJECT_ID=`gcloud config get-value core/project`
+export PROJECT_NUMBER=`gcloud projects describe $PROJECT_ID --format='value(projectNumber)'`
+
+gcloud iam service-accounts create grpc-client
+gcloud iam service-accounts keys  create certs/grpc_client.json --iam-account=grpc-client@$PROJECT_ID.iam.gserviceaccount.com
+
+```
+
 ### Golang
 
 You can run he go sample here in two modes: secure and insecure.  If you want to transmit the `Authorization` Header, its encouraged to run the secure mode.
 
 
-```
+```bash
 cd golang
+cp -R ../certs .
 docker build -t client -f Dockerfile.client .
 docker build -t server -f Dockerfile.server .
 ```
@@ -121,7 +136,7 @@ docker build -t server -f Dockerfile.server .
 ```
 docker run -p 8080:8080 server /grpc_server \
   --grpcport=:8080 --targetAudience=https://foo.bar \
-  --usetls=false --validateToken=true
+  --usetls=true --validateToken=true
 ```
 
 - Client
@@ -130,9 +145,8 @@ docker run --net=host \
   -v `pwd`/certs:/certs -t client /grpc_client \
   --address localhost:8080  --usetls=true  \
   --servername grpc.domain.com --audience https://foo.bar \
-  --cacert CA_crt.pem --serviceAccount /certs/grpc_client.json
+  --cacert tls-ca.crt --serviceAccount /certs/grpc_client.json
 ```
-Remember to place the service account JSOn file under the local `certs/` folder (for example for go `grpc_google_id_tokens/golang/certs/grpc_client.json` or wherever you mount the volume)
 
 
 ### Python
@@ -149,7 +163,7 @@ If needed, you can install the protoc support compiler, first run
 ```
 python -m pip install grpcio-tools google-auth
 
-python -m grpc_tools.protoc -Isrc --python_out=. --grpc_python_out=. echo.proto
+python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. echo.proto
 ```
 
 References:
@@ -164,17 +178,21 @@ to run, just execute `mvn clean install exec:java`
 
 
 If you want to regenerate the proto, [download the plugin](https://github.com/grpc/grpc-java/tree/master/compiler), then execute the compiler
-```
- protoc --plugin=protoc-gen-grpc-java=/path/to/protoc-gen-grpc-java --java_out=src/main/java   --grpc-java_out=lite:src/main/java/ --proto_path=echo/ echo/echo.proto
-```
 
+```bash
+wget https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/1.49.1/protoc-gen-grpc-java-1.49.1-linux-x86_64.exe -P /tmp/
+chmod u+x /tmp/protoc-gen-grpc-java-1.49.1-linux-x86_64.exe
+
+protoc --plugin=protoc-gen-grpc-java=/tmp/protoc-gen-grpc-java-1.49.1-linux-x86_64.exe --java_out=src/main/java  \
+    --grpc-java_out=lite:src/main/java/ --proto_path=echo/ echo/echo.proto
+```
 
 ### Nodejs
 
 Node already has support for id_tokens so running the sample is pretty easy
 
 
-```
+```bash
 npm i
 node app.js
 ```
@@ -186,8 +204,11 @@ A sample envoy proxy configuration is proivded here which you can use that proxy
 To run, first startup the server in _insecure_ mode on port `:8080`
 
 - Server
-```
-go run  src/grpc_server.go --grpcport :8080 --cert $CERTS/server_crt.pem --key ../certs/server_key.pem --targetAudience https://foo.bar --usetls=false --validateToken=false
+
+```bash
+go run  src/grpc_server.go --grpcport :8080 \
+  --cert $CERTS/server_crt.pem --key ../certs/server_key.pem  \
+  --targetAudience https://foo.bar --usetls=false --validateToken=false
 ```
 
 Now run the envoy proxy which will listen on `:18080`
@@ -201,10 +222,11 @@ envoy -c envoy_config.yaml
 Now run the client to connect to the proxy
 - Client
 
+```bash
+go run src/grpc_client.go \
+  --address localhost:18080 --usetls=true --cacert ../certs/tls-ca.crt \
+  --servername grpc.domain.com --audience  https://foo.bar --serviceAccount=../certs//grpc_client.json
 ```
-go run src/grpc_client.go --address localhost:18080 --usetls=true --cacert ../certs/CA_crt.pem --servername grpc.domain.com --audience  https://foo.bar --serviceAccount=/path/to/svc_account.json
-```
-
 
 ## Conclusion
 

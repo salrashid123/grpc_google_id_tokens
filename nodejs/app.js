@@ -8,10 +8,10 @@ var PROTO_PATH = __dirname + '/echo.proto';
 var target_audience = 'https://foo.bar';
 var address = 'localhost:8080';
 
-var svcAccountFile = '/path/to/svc_account.json';
+var svcAccountFile = '../certs/grpc_client.json';
 
-var certificateFile = '../certs/CA_crt.pem';
-var sniServerName = 'server.domain.com';
+var certificateFile = '../certs/tls-ca.crt';
+var sniServerName = 'grpc.domain.com';
 
 var usetls = true;
 
