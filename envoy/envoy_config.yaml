@@ -13,7 +13,7 @@ static_resources:
   listeners:
   - name: listener_0
     address:
-      socket_address: { address: 0.0.0.0, port_value: 18080 }
+      socket_address: { address: 0.0.0.0, port_value: 8080 }
     filter_chains:
     - filters:
       - name: envoy.filters.network.http_connection_manager
@@ -43,6 +43,7 @@ static_resources:
               providers:          
                 google-jwt:
                   issuer: https://accounts.google.com
+                  forward: true
                   audiences:
                   - http://foo.bar
                   remote_jwks:
@@ -71,9 +72,9 @@ static_resources:
           common_tls_context:
             tls_certificates:
             - certificate_chain:
-                filename: "../certs/server_crt.pem"
+                filename: "../certs/localhost.crt"
               private_key:
-                filename: "../certs/server_key.pem"
+                filename: "../certs/localhost.key"
   clusters:
   - name: local_grpc_endpoint
     connect_timeout: 0.05s
@@ -91,8 +92,15 @@ static_resources:
             address:
               socket_address:
                 address: 127.0.0.1
-                port_value: 8080  
-
+                port_value: 8081
+    transport_socket:
+      name: envoy.transport_sockets.tls
+      typed_config:
+        "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+        common_tls_context:    
+          validation_context:
+            trusted_ca:
+              filename: "../certs/tls-ca.crt"  
 
   - name: local_admin
     connect_timeout: 0.05s
@@ -127,8 +135,8 @@ static_resources:
       name: envoy.transport_sockets.tls
       typed_config:
         "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
-        common_tls_context:    
-          validation_context:
-            trusted_ca:
-              filename: "../certs/gcp_roots.pem"  
+        # common_tls_context:    
+        #   validation_context:
+        #     trusted_ca:
+        #       filename: "../certs/gcp_roots.pem"  
               # wget -O gcp_roots.pem https://pki.google.com/roots.pem

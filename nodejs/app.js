@@ -6,7 +6,7 @@ var protoLoader = require('@grpc/proto-loader');
 var PROTO_PATH = __dirname + '/echo.proto';
 
 var target_audience = 'https://foo.bar';
-var address = 'localhost:8080';
+var address = 'localhost:8081';
 
 var svcAccountFile = '../certs/grpc_client.json';
 

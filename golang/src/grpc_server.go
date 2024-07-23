@@ -23,10 +23,9 @@ import (
 )
 
 var (
-	grpcport       = flag.String("grpcport", ":8080", "grpcport")
-	usetls         = flag.Bool("usetls", false, "startup using TLS")
-	serverCert     = flag.String("cert", "server_crt.pem", "Server TLS cert")
-	serverKey      = flag.String("key", "server_key.pem", "Server TLS key")
+	grpcport       = flag.String("grpcport", ":8081", "grpcport")
+	serverCert     = flag.String("cert", "../certs/server_crt.pem", "Server TLS cert")
+	serverKey      = flag.String("key", "../certs/server_key.pem", "Server TLS key")
 	targetAudience = flag.String("targetAudience", "", "OIDC audience to check")
 	validateToken  = flag.Bool("validateToken", false, "validateToken field")
 )
@@ -133,14 +132,12 @@ func main() {
 
 	sopts := []grpc.ServerOption{grpc.MaxConcurrentStreams(10)}
 
-	if *usetls {
-		ce, err := credentials.NewServerTLSFromFile(*serverCert, *serverKey)
-		if err != nil {
-			log.Fatalf("Failed to generate credentials %v", err)
-		}
-		log.Printf("Starting gRPC server with TLS")
-		sopts = append(sopts, grpc.Creds(ce))
+	ce, err := credentials.NewServerTLSFromFile(*serverCert, *serverKey)
+	if err != nil {
+		log.Fatalf("Failed to generate credentials %v", err)
 	}
+	log.Printf("Starting gRPC server with TLS")
+	sopts = append(sopts, grpc.Creds(ce))
 
 	if *validateToken {
 		sopts = append(sopts, grpc.UnaryInterceptor(authUnaryInterceptor))

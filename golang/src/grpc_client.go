@@ -22,16 +22,8 @@ import (
 
 const ()
 
-type grpcTokenSource struct {
-	oauth.TokenSource
-	// Additional metadata attached as headers.
-	quotaProject  string
-	requestReason string
-}
-
 var (
 	address        = flag.String("address", "localhost:8080", "host:port of gRPC server")
-	usetls         = flag.Bool("usetls", false, "startup using TLS")
 	targetAudience = flag.String("audience", "https://foo.bar", " audience for the token")
 	cacert         = flag.String("cacert", "", "root CA Certificate for TLS")
 	sniServerName  = flag.String("servername", "grpc.domain.com", "SNIServer Name assocaited with the server")
@@ -55,38 +47,31 @@ func main() {
 	log.Printf("IdToken %s", tok)
 
 	var conn *grpc.ClientConn
-	if !*usetls {
-		conn, err = grpc.Dial(*address, grpc.WithInsecure())
-		if err != nil {
-			log.Fatalf("did not connect: %v", err)
-		}
-	} else {
-		var tlsCfg tls.Config
-		if len(*cacert) > 0 {
-			rootCAs := x509.NewCertPool()
-			pem, err := ioutil.ReadFile(*cacert)
-			if err != nil {
-				log.Fatalf("failed to load root CA certificates  error=%v", err)
-			}
-			if !rootCAs.AppendCertsFromPEM(pem) {
-				log.Fatalf("no root CA certs parsed from file ")
-			}
-			tlsCfg.RootCAs = rootCAs
-		}
-		tlsCfg.ServerName = *sniServerName
 
-		ce := credentials.NewTLS(&tlsCfg)
-		conn, err = grpc.Dial(*address,
-			grpc.WithTransportCredentials(ce),
-			grpc.WithPerRPCCredentials(grpcTokenSource{
-				TokenSource: oauth.TokenSource{
-					idTokenSource,
-				},
-			}),
-		)
+	var tlsCfg tls.Config
+	if len(*cacert) > 0 {
+		rootCAs := x509.NewCertPool()
+		pem, err := ioutil.ReadFile(*cacert)
 		if err != nil {
-			log.Fatalf("did not connect: %v", err)
+			log.Fatalf("failed to load root CA certificates  error=%v", err)
 		}
+		if !rootCAs.AppendCertsFromPEM(pem) {
+			log.Fatalf("no root CA certs parsed from file ")
+		}
+		tlsCfg.RootCAs = rootCAs
+	}
+	tlsCfg.ServerName = *sniServerName
+
+	ce := credentials.NewTLS(&tlsCfg)
+	conn, err = grpc.Dial(*address,
+		grpc.WithTransportCredentials(ce),
+		grpc.WithPerRPCCredentials(oauth.TokenSource{
+			idTokenSource,
+		},
+		),
+	)
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
 

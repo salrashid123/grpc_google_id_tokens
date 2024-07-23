@@ -47,7 +47,7 @@ public class TestApp {
                ManagedChannel ch;
                if (usetls) {
                     //ch = ManagedChannelBuilder.forAddress(address, port).useTransportSecurity().build();
-                    ch = NettyChannelBuilder.forAddress("localhost", 8080)
+                    ch = NettyChannelBuilder.forAddress("localhost", 8081)
                     .overrideAuthority(sniServerName)
                     .sslContext(GrpcSslContexts.forClient().trustManager(new File(certificateFile)).build())
                     .build();
