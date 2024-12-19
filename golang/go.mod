@@ -6,7 +6,7 @@ toolchain go1.21.12
 
 require (
 	github.com/salrashid123/grpc_google_id_tokens/echo v0.0.0
-	golang.org/x/net v0.0.0-20200506145744-7e3656a0809f
+	golang.org/x/net v0.7.0
 	google.golang.org/api v0.24.0
 	google.golang.org/grpc v1.29.1
 )
